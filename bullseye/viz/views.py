@@ -71,7 +71,7 @@ def create_plot(ticker_histories):
                                 label='Select Ticker',
                                 method='update',
                                 args=[
-                                    {'visible': [False for _ in range(n_tickers * 12)]},
+                                    {'visible': [False for _ in range(n_tickers * 30)]},
                                     {'title': None},
                                 ]
                             )
