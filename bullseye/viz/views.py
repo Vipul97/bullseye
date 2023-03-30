@@ -12,7 +12,7 @@ def get_ticker_histories(tickers, period='5y'):
         history = yf.Ticker(ticker).history(period=period)
 
         for col in ['Open', 'High', 'Low', 'Close']:
-            for window in [5, 10, 20, 50, 100, 200]:
+            for window in [5, 10, 20, 50, 100, 150, 200]:
                 history[f'{col} {window} Day MA'] = history[col].rolling(window=window).mean()
 
         histories[ticker] = history
@@ -53,7 +53,7 @@ def create_plot(ticker_histories):
         )
 
         for col in ['Open', 'High', 'Low', 'Close']:
-            for window in [5, 10, 20, 50, 100, 200]:
+            for window in [5, 10, 20, 50, 100, 150, 200]:
                 fig.add_trace(
                     go.Scatter(x=history.index, y=history[f'{col} {window} Day MA'], name=f'{col} {window} Day MA',
                                visible=False),
