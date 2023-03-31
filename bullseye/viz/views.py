@@ -62,6 +62,42 @@ def create_plot(ticker_histories):
                 )
 
     fig.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1D",
+                         step="day",
+                         stepmode="backward"),
+                    dict(count=5,
+                         label="5D",
+                         step="day",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="1M",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6M",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1Y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(count=5,
+                         label="5Y",
+                         step="year",
+                         stepmode="backward"),
+                    # dict(label="MAX",
+                    #      step="all")
+                ])
+            ),
+        ),
         yaxis_title='Price (USD)',
         height=800,
         updatemenus=[
