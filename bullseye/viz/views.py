@@ -43,14 +43,21 @@ def create_plot(ticker_histories):
                 visible=False
             ),
             row=1,
-            col=1,
+            col=1
         )
 
         fig.add_trace(
             go.Bar(x=history.index, y=history['Volume'], marker_color='blue', showlegend=False, visible=False),
             row=2,
-            col=1,
+            col=1
         )
+
+        for col in ['Open', 'High', 'Low', 'Close']:
+            fig.add_trace(
+                go.Scatter(x=history.index, y=history[col], name=col, visible=False),
+                row=1,
+                col=1,
+            )
 
         for col in ['Open', 'High', 'Low', 'Close']:
             for window in [5, 10, 20, 50, 100, 150, 200]:
@@ -58,7 +65,7 @@ def create_plot(ticker_histories):
                     go.Scatter(x=history.index, y=history[f'{col} {window} Day MA'], name=f'{col} {window} Day MA',
                                visible=False),
                     row=1,
-                    col=1,
+                    col=1
                 )
 
     fig.update_layout(
@@ -107,7 +114,7 @@ def create_plot(ticker_histories):
                                 label='Select Ticker',
                                 method='update',
                                 args=[
-                                    {'visible': [False for _ in range(n_tickers * 30)]},
+                                    {'visible': [False for _ in range(n_tickers * 34)]},
                                     {'title': None},
                                 ]
                             )
@@ -116,8 +123,8 @@ def create_plot(ticker_histories):
                                 label=ticker,
                                 method='update',
                                 args=[
-                                    {'visible': [False] * (30 * i) + [True] * 2 + ['legendonly'] * 28 + [False] * (
-                                            30 * n_tickers - i)},
+                                    {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
+                                            34 * n_tickers - i)},
                                     {'title': ticker},
                                 ]
                             )
