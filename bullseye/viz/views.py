@@ -125,7 +125,9 @@ def create_plot(ticker_histories):
                                 args=[
                                     {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
                                             34 * n_tickers - i)},
-                                    {'title': ticker},
+                                    {
+                                        'title': f'{yf.Ticker(ticker).info["longName"]}: {yf.Ticker(ticker).info["regularMarketPrice"]}'
+                                    },
                                 ]
                             )
                             for i, ticker in enumerate(ticker_histories)
