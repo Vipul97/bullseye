@@ -131,7 +131,11 @@ def create_plot(ticker_histories):
                                 ]
                             )
                             for i, ticker in enumerate(ticker_histories)
-                        ]
+                        ],
+                direction="right",
+                xanchor="left",
+                x=0,
+                y=1.3,
             )
         ],
         legend=dict(orientation="h")
