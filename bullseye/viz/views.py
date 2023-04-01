@@ -133,7 +133,8 @@ def create_plot(ticker_histories):
                             for i, ticker in enumerate(ticker_histories)
                         ]
             )
-        ]
+        ],
+        legend=dict(orientation="h")
     )
     fig.update(layout_xaxis_rangeslider_visible=False)
 
