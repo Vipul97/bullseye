@@ -27,8 +27,7 @@ def create_plot(ticker_histories):
         rows=2,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=0.1,
-        subplot_titles=[None, 'Volume'],
+        vertical_spacing=0.05,
         row_width=[0.2, 0.8]
     )
 
@@ -106,7 +105,6 @@ def create_plot(ticker_histories):
                 ])
             ),
         ),
-        yaxis_title='Price (USD)',
         height=800,
         updatemenus=[
             dict(
