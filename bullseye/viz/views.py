@@ -125,7 +125,7 @@ def create_plot(ticker_histories):
                                     {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
                                             34 * n_tickers - i)},
                                     {
-                                        'title': f'{yf.Ticker(ticker).info["longName"]}: {yf.Ticker(ticker).info["regularMarketPrice"]}'
+                                        'title': f'{yf.Ticker(ticker).info["longName"]}: {yf.Ticker(ticker).info["regularMarketPrice"]}, {yf.Ticker(ticker).info["regularMarketChange"]:.2f} ({yf.Ticker(ticker).info["regularMarketChangePercent"]:.2f}%)'
                                     },
                                 ]
                             )
