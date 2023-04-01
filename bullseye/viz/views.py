@@ -13,7 +13,8 @@ def get_ticker_histories(tickers, period='5y'):
 
         for col in ['Open', 'High', 'Low', 'Close']:
             for window in [5, 10, 20, 50, 100, 150, 200]:
-                history[f'{col} {window} Day MA'] = history[col].rolling(window=window).mean()
+                col_window = f'{col} {window} Day MA'
+                history[col_window] = history[col].rolling(window=window).mean()
 
         histories[ticker] = history
 
@@ -56,56 +57,34 @@ def create_plot(ticker_histories):
             fig.add_trace(
                 go.Scatter(x=history.index, y=history[col], name=col, visible=False),
                 row=1,
-                col=1,
+                col=1
             )
 
         for col in ['Open', 'High', 'Low', 'Close']:
             for window in [5, 10, 20, 50, 100, 150, 200]:
+                col_window = f'{col} {window} Day MA'
                 fig.add_trace(
-                    go.Scatter(x=history.index, y=history[f'{col} {window} Day MA'], name=f'{col} {window} Day MA',
-                               visible=False),
+                    go.Scatter(x=history.index, y=history[col_window], name=col_window, visible=False),
                     row=1,
                     col=1
                 )
 
     fig.update_layout(
+        height=800,
         xaxis=dict(
             rangeselector=dict(
-                buttons=list([
-                    dict(count=1,
-                         label="1D",
-                         step="day",
-                         stepmode="backward"),
-                    dict(count=5,
-                         label="5D",
-                         step="day",
-                         stepmode="backward"),
-                    dict(count=1,
-                         label="1M",
-                         step="month",
-                         stepmode="backward"),
-                    dict(count=6,
-                         label="6M",
-                         step="month",
-                         stepmode="backward"),
-                    dict(count=1,
-                         label="YTD",
-                         step="year",
-                         stepmode="todate"),
-                    dict(count=1,
-                         label="1Y",
-                         step="year",
-                         stepmode="backward"),
-                    dict(count=5,
-                         label="5Y",
-                         step="year",
-                         stepmode="backward"),
-                    # dict(label="MAX",
-                    #      step="all")
-                ])
-            ),
+                buttons=[
+                    dict(count=1, label='1D', step='day', stepmode='backward'),
+                    dict(count=5, label='5D', step='day', stepmode='backward'),
+                    dict(count=1, label='1M', step='month', stepmode='backward'),
+                    dict(count=6, label='6M', step='month', stepmode='backward'),
+                    dict(count=1, label='YTD', step='year', stepmode='todate'),
+                    dict(count=1, label='1Y', step='year', stepmode='backward'),
+                    dict(count=5, label='5Y', step='year', stepmode='backward'),
+                    # dict(label='MAX', step='all')
+                ]
+            )
         ),
-        height=800,
         updatemenus=[
             dict(
                 buttons=[
@@ -114,7 +93,7 @@ def create_plot(ticker_histories):
                                 method='update',
                                 args=[
                                     {'visible': [False for _ in range(n_tickers * 34)]},
-                                    {'title': None},
+                                    {'title': None}
                                 ]
                             )
                         ] + [
@@ -125,23 +104,23 @@ def create_plot(ticker_histories):
                                     {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
                                             34 * n_tickers - i)},
                                     {
-                                        'title': f'{yf.Ticker(ticker).info["longName"]}: {yf.Ticker(ticker).info["regularMarketPrice"]}, {yf.Ticker(ticker).info["regularMarketChange"]:.2f} ({yf.Ticker(ticker).info["regularMarketChangePercent"]:.2f}%)'
-                                    },
+                                        'title': f'<b>{yf.Ticker(ticker).info["longName"]}</b><br><b style="font-size: 20px;">{yf.Ticker(ticker).info["regularMarketPrice"]:.2f}</b> <span style="color: {"green;" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else "red;"}">{"+" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else None}{yf.Ticker(ticker).info["regularMarketChange"]:.2f} ({"+" if yf.Ticker(ticker).info["regularMarketChangePercent"] > 0 else None}{yf.Ticker(ticker).info["regularMarketChangePercent"]:.2f}%)</span>'
+                                    }
                                 ]
                             )
                             for i, ticker in enumerate(ticker_histories)
                         ],
-                direction="right",
-                xanchor="left",
+                direction='right',
+                xanchor='left',
                 x=0,
-                y=1.3,
+                y=1.3
             )
         ],
-        legend=dict(orientation="h")
+        legend=dict(orientation='h')
     )
     fig.update(layout_xaxis_rangeslider_visible=False)
 
-    return plot(fig, output_type='div', config=dict({"scrollZoom": True}))
+    return plot(fig, output_type='div', config=dict({'scrollZoom': True}))
 
 
 def viz(request):
@@ -149,4 +128,4 @@ def viz(request):
     ticker_histories = get_ticker_histories(tickers)
     plot_div = create_plot(ticker_histories)
 
-    return render(request, "viz/viz.html", context={'plot_div': plot_div})
+    return render(request, 'viz/viz.html', context={'plot_div': plot_div})
