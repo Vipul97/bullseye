@@ -47,7 +47,7 @@ def create_plot(ticker_histories):
         )
 
         fig.add_trace(
-            go.Bar(x=history.index, y=history['Volume'], marker_color='blue', showlegend=False, visible=False),
+            go.Bar(x=history.index, y=history['Volume'], marker=dict(color='blue'), showlegend=False, visible=False),
             row=2,
             col=1
         )
