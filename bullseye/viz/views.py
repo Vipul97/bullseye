@@ -29,6 +29,7 @@ def create_plot(ticker_histories):
         shared_xaxes=True,
         vertical_spacing=0.1,
         subplot_titles=[None, 'Volume'],
+        row_width=[0.2, 0.8]
     )
 
     for ticker, history in ticker_histories.items():
