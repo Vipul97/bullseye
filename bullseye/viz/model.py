@@ -1,5 +1,8 @@
 import joblib
 import numpy as np
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 class Model:
@@ -12,6 +15,6 @@ class Model:
         last_60_days_close_scaled = self.scaler.transform(last_60_days_close.reshape(-1, 1))
 
         X = np.reshape(last_60_days_close_scaled, (1, -1, 1))
-        y_pred = self.scaler.inverse_transform(self.model.predict(X))
+        y_pred = self.scaler.inverse_transform(self.model.predict(X, verbose=0))
 
         return y_pred.item()
