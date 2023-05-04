@@ -135,7 +135,7 @@ def create_plot(ticker_histories):
     )
     fig.update(layout_xaxis_rangeslider_visible=False)
 
-    return plot(fig, output_type='div', config=dict({'scrollZoom': True}))
+    return plot(fig, output_type='div', config=dict({'scrollZoom': True, 'doubleClick': 'autosize'}))
 
 
 def viz(request):
