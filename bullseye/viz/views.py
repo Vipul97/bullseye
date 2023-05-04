@@ -2,6 +2,7 @@ from django.shortcuts import render
 from plotly.offline import plot
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import datetime
 import yfinance as yf
 
 
@@ -69,6 +70,8 @@ def create_plot(ticker_histories):
                     col=1
                 )
 
+    today = datetime.date.today()
+    last_month = today.replace(month=today.month - 1)
     fig.update_layout(
         height=800,
         xaxis=dict(
@@ -83,7 +86,8 @@ def create_plot(ticker_histories):
                     dict(count=5, label='5Y', step='year', stepmode='backward'),
                     # dict(label='MAX', step='all')
                 ]
-            )
+            ),
+            range=[last_month, today]
         ),
         updatemenus=[
             dict(
