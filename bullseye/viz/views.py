@@ -143,4 +143,4 @@ def viz(request):
     ticker_histories = get_ticker_histories(tickers)
     plot_div = create_plot(ticker_histories)
 
-    return render(request, 'viz/viz.html', context={'plot_div': plot_div})
+    return render(request, 'viz/base.html', context={'plot_div': plot_div})
