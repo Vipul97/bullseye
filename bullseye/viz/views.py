@@ -23,6 +23,17 @@ def get_ticker_histories(tickers, period='5y'):
 
 
 def create_plot(ticker_histories):
+    def get_title(ticker):
+        ticker_info = yf.Ticker(ticker).info
+        long_name = ticker_info["longName"]
+        price = ticker_info["regularMarketPrice"]
+        change = ticker_info["regularMarketChange"]
+        change_percent = ticker_info["regularMarketChangePercent"]
+        color = "green" if change > 0 else "red"
+        plus = "+" if change > 0 else ""
+        return f'<b>{long_name}</b><br><b style="font-size: 20px;">{price:.2f}</b> ' \
+               f'<span style="color: {color};">{plus}{change:.2f} ({plus}{change_percent:.2f}%)</span>'
+
     n_tickers = len(ticker_histories)
 
     fig = make_subplots(
@@ -108,7 +119,7 @@ def create_plot(ticker_histories):
                                     {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
                                             34 * n_tickers - i)},
                                     {
-                                        'title': f'<b>{yf.Ticker(ticker).info["longName"]}</b><br><b style="font-size: 20px;">{yf.Ticker(ticker).info["regularMarketPrice"]:.2f}</b> <span style="color: {"green;" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else "red;"}">{"+" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else ""}{yf.Ticker(ticker).info["regularMarketChange"]:.2f} ({"+" if yf.Ticker(ticker).info["regularMarketChangePercent"] > 0 else ""}{yf.Ticker(ticker).info["regularMarketChangePercent"]:.2f}%)</span>'
+                                        'title': get_title(ticker)
                                     }
                                 ]
                             )
