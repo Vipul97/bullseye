@@ -104,7 +104,7 @@ def create_plot(ticker_histories):
                                     {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
                                             34 * n_tickers - i)},
                                     {
-                                        'title': f'<b>{yf.Ticker(ticker).info["longName"]}</b><br><b style="font-size: 20px;">{yf.Ticker(ticker).info["regularMarketPrice"]:.2f}</b> <span style="color: {"green;" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else "red;"}">{"+" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else None}{yf.Ticker(ticker).info["regularMarketChange"]:.2f} ({"+" if yf.Ticker(ticker).info["regularMarketChangePercent"] > 0 else None}{yf.Ticker(ticker).info["regularMarketChangePercent"]:.2f}%)</span>'
+                                        'title': f'<b>{yf.Ticker(ticker).info["longName"]}</b><br><b style="font-size: 20px;">{yf.Ticker(ticker).info["regularMarketPrice"]:.2f}</b> <span style="color: {"green;" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else "red;"}">{"+" if yf.Ticker(ticker).info["regularMarketChange"] > 0 else ""}{yf.Ticker(ticker).info["regularMarketChange"]:.2f} ({"+" if yf.Ticker(ticker).info["regularMarketChangePercent"] > 0 else ""}{yf.Ticker(ticker).info["regularMarketChangePercent"]:.2f}%)</span>'
                                     }
                                 ]
                             )
