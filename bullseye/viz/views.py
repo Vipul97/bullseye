@@ -27,9 +27,10 @@ def create_plot(ticker_histories, model):
     def get_title(ticker, history, model):
         ticker_info = yf.Ticker(ticker).info
         long_name = ticker_info["longName"]
-        price = ticker_info["regularMarketPrice"]
-        change = ticker_info["regularMarketChange"]
-        change_percent = ticker_info["regularMarketChangePercent"]
+        price = ticker_info["currentPrice"]
+        prev_close = ticker_info["previousClose"]
+        change = price - prev_close
+        change_percent = change / price * 100
         color = "green" if change > 0 else "red"
         plus = "+" if change > 0 else ""
         prediction = model.predict(history)
@@ -37,7 +38,7 @@ def create_plot(ticker_histories, model):
 
         return f'<b>{long_name}</b><br><b style="font-size: 20px;">{price:.2f}</b> ' \
                f'<span style="color: {color};">{plus}{change:.2f} ({plus}{change_percent:.2f}%)</span><br>' \
-               f'Prediction for next working day: <b style="font-size: 20px; color: {prediction_color};">{prediction:.2f}</b>'
+               f'Close Price prediction for next working day: <b style="font-size: 20px; color: {prediction_color};">{prediction:.2f}</b>'
 
     fig = make_subplots(
         rows=2,
