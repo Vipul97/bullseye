@@ -68,7 +68,7 @@ def create_plot(ticker_history, title):
 
     for col in ['Open', 'High', 'Low', 'Close']:
         fig.add_trace(
-            go.Scatter(x=ticker_history.index, y=ticker_history[col], name=col),
+            go.Scatter(x=ticker_history.index, y=ticker_history[col], name=col, visible='legendonly'),
             row=1,
             col=1
         )
@@ -77,7 +77,7 @@ def create_plot(ticker_history, title):
         for window in [5, 10, 20, 50, 100, 150, 200]:
             col_window = f'{col} {window} Day MA'
             fig.add_trace(
-                go.Scatter(x=ticker_history.index, y=ticker_history[col_window], name=col_window),
+                go.Scatter(x=ticker_history.index, y=ticker_history[col_window], name=col_window, visible='legendonly'),
                 row=1,
                 col=1
             )
