@@ -6,40 +6,39 @@ import plotly.graph_objects as go
 import datetime
 import yfinance as yf
 
-
-def get_ticker_histories(tickers, period='5y'):
-    histories = {}
-
-    for ticker in tickers:
-        history = yf.Ticker(ticker).history(period=period)
-
-        for col in ['Open', 'High', 'Low', 'Close']:
-            for window in [5, 10, 20, 50, 100, 150, 200]:
-                col_window = f'{col} {window} Day MA'
-                history[col_window] = history[col].rolling(window=window).mean()
-
-        histories[ticker] = history
-
-    return histories
+MODEL_FILENAME = 'viz/model.pkl'
+SCALER_FILENAME = 'viz/scaler.pkl'
 
 
-def create_plot(ticker_histories, model):
-    def get_title(ticker, history, model):
-        ticker_info = yf.Ticker(ticker).info
-        long_name = ticker_info["longName"]
-        price = ticker_info["currentPrice"]
-        prev_close = ticker_info["previousClose"]
-        change = price - prev_close
-        change_percent = change / price * 100
-        color = "green" if change > 0 else "red"
-        plus = "+" if change > 0 else ""
-        prediction = model.predict(history)
-        prediction_color = "green" if prediction > price else "red"
+def get_ticker_history(ticker, period='5y'):
+    ticker_history = yf.Ticker(ticker).history(period=period)
 
-        return f'<b>{long_name}</b><br><b style="font-size: 20px;">{price:.2f}</b> ' \
-               f'<span style="color: {color};">{plus}{change:.2f} ({plus}{change_percent:.2f}%)</span><br>' \
-               f'Close Price prediction for next working day: <b style="font-size: 20px; color: {prediction_color};">{prediction:.2f}</b>'
+    for col in ['Open', 'High', 'Low', 'Close']:
+        for window in [5, 10, 20, 50, 100, 150, 200]:
+            col_window = f'{col} {window} Day MA'
+            ticker_history[col_window] = ticker_history[col].rolling(window=window).mean()
 
+    return ticker_history
+
+
+def get_title(ticker, ticker_history, model):
+    ticker_info = yf.Ticker(ticker).info
+    long_name = ticker_info["longName"]
+    price = ticker_info["currentPrice"]
+    prev_close = ticker_info["previousClose"]
+    change = price - prev_close
+    change_percent = change / price * 100
+    color = "green" if change > 0 else "red"
+    plus = "+" if change > 0 else ""
+    prediction = model.predict(ticker_history)
+    prediction_color = "green" if prediction > price else "red"
+
+    return f'<b>{long_name}</b><br><b style="font-size: 20px;">{price:.2f}</b> ' \
+           f'<span style="color: {color};">{plus}{change:.2f} ({plus}{change_percent:.2f}%)</span><br>' \
+           f'Close Price prediction for next working day: <b style="font-size: 20px; color: {prediction_color};">{prediction:.2f}</b>'
+
+
+def create_plot(ticker_history, title):
     fig = make_subplots(
         rows=2,
         cols=1,
@@ -48,47 +47,45 @@ def create_plot(ticker_histories, model):
         row_width=[0.2, 0.8]
     )
 
-    for ticker, history in ticker_histories.items():
+    fig.add_trace(
+        go.Candlestick(
+            x=ticker_history.index,
+            open=ticker_history['Open'],
+            high=ticker_history['High'],
+            low=ticker_history['Low'],
+            close=ticker_history['Close'],
+            name='Candlestick',
+        ),
+        row=1,
+        col=1
+    )
+
+    fig.add_trace(
+        go.Bar(x=ticker_history.index, y=ticker_history['Volume'], marker=dict(color='blue'), showlegend=False),
+        row=2,
+        col=1
+    )
+
+    for col in ['Open', 'High', 'Low', 'Close']:
         fig.add_trace(
-            go.Candlestick(
-                x=history.index,
-                open=history['Open'],
-                high=history['High'],
-                low=history['Low'],
-                close=history['Close'],
-                name='Candlestick',
-                visible=False
-            ),
+            go.Scatter(x=ticker_history.index, y=ticker_history[col], name=col),
             row=1,
             col=1
         )
 
-        fig.add_trace(
-            go.Bar(x=history.index, y=history['Volume'], marker=dict(color='blue'), showlegend=False, visible=False),
-            row=2,
-            col=1
-        )
-
-        for col in ['Open', 'High', 'Low', 'Close']:
+    for col in ['Open', 'High', 'Low', 'Close']:
+        for window in [5, 10, 20, 50, 100, 150, 200]:
+            col_window = f'{col} {window} Day MA'
             fig.add_trace(
-                go.Scatter(x=history.index, y=history[col], name=col, visible=False),
+                go.Scatter(x=ticker_history.index, y=ticker_history[col_window], name=col_window),
                 row=1,
                 col=1
             )
 
-        for col in ['Open', 'High', 'Low', 'Close']:
-            for window in [5, 10, 20, 50, 100, 150, 200]:
-                col_window = f'{col} {window} Day MA'
-                fig.add_trace(
-                    go.Scatter(x=history.index, y=history[col_window], name=col_window, visible=False),
-                    row=1,
-                    col=1
-                )
-
     today = datetime.date.today()
     last_month = today.replace(month=today.month - 1)
-    n_tickers = len(ticker_histories)
     fig.update_layout(
+        title=dict(text=title),
         height=800,
         xaxis=dict(
             rangeselector=dict(
@@ -105,38 +102,8 @@ def create_plot(ticker_histories, model):
             ),
             range=[last_month, today]
         ),
-        updatemenus=[
-            dict(
-                buttons=[
-                            dict(
-                                label='Select Ticker',
-                                method='update',
-                                args=[
-                                    {'visible': [False for _ in range(n_tickers * 34)]},
-                                    {'title': None}
-                                ]
-                            )
-                        ] + [
-                            dict(
-                                label=ticker,
-                                method='update',
-                                args=[
-                                    {'visible': [False] * (34 * i) + [True] * 2 + ['legendonly'] * 32 + [False] * (
-                                            34 * n_tickers - i)},
-                                    {
-                                        'title': get_title(ticker, ticker_histories[ticker], model)
-                                    }
-                                ]
-                            )
-                            for i, ticker in enumerate(ticker_histories)
-                        ],
-                direction='right',
-                xanchor='left',
-                x=0,
-                y=1.3
-            )
-        ],
-        legend=dict(orientation='h')
+        legend=dict(orientation='h'),
+        margin=dict(t=200)
     )
     fig.update(layout_xaxis_rangeslider_visible=False)
 
@@ -144,9 +111,10 @@ def create_plot(ticker_histories, model):
 
 
 def viz(request):
-    tickers = ['MSFT', 'META', 'AAPL', 'GOOG', 'AMZN']
-    ticker_histories = get_ticker_histories(tickers)
-    model = Model('viz/model.pkl', 'viz/scaler.pkl')
-    plot_div = create_plot(ticker_histories, model)
+    ticker = request.GET.get('ticker')
+    ticker_history = get_ticker_history(ticker)
+    model = Model(MODEL_FILENAME, SCALER_FILENAME)
+    title = get_title(ticker, ticker_history, model)
+    plot_div = create_plot(ticker_history, title)
 
     return render(request, 'viz/base.html', context={'plot_div': plot_div})
