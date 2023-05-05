@@ -39,14 +39,20 @@ def create_plot(ticker_history):
             low=ticker_history['Low'],
             close=ticker_history['Close'],
             name='Candlestick',
-            hoverlabel=dict(namelength=0),
+            hoverlabel=dict(namelength=0)
         ),
         row=1,
         col=1
     )
 
     fig.add_trace(
-        go.Bar(x=ticker_history.index, y=ticker_history['Volume'], marker=dict(color='blue'), showlegend=False, hoverlabel=dict(namelength=0),),
+        go.Bar(
+            x=ticker_history.index,
+            y=ticker_history['Volume'],
+            marker=dict(color='blue'),
+            showlegend=False,
+            hoverlabel=dict(namelength=0)
+        ),
         row=2,
         col=1
     )
