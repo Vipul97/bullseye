@@ -133,4 +133,4 @@ def viz(request):
         'plot_div': plot_div
     }
 
-    return render(request, 'viz/base.html', context=context)
+    return render(request, 'viz/viz.html', context=context)
