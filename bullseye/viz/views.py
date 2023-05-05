@@ -1,4 +1,5 @@
 from .model import Model
+from django.http import Http404
 from django.shortcuts import render
 from plotly.offline import plot
 from plotly.subplots import make_subplots
@@ -94,6 +95,10 @@ def create_plot(ticker_history):
 def viz(request):
     ticker = request.GET.get('ticker')
     ticker_history = get_ticker_history(ticker)
+
+    if ticker_history.empty:
+        raise Http404("Invalid Ticker!")
+
     model = Model(MODEL_FILENAME, SCALER_FILENAME)
     ticker_info = yf.Ticker(ticker).info
 
