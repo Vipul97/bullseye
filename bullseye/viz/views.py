@@ -21,24 +21,7 @@ def get_ticker_history(ticker, period='5y'):
     return ticker_history
 
 
-def get_title(ticker, ticker_history, model):
-    ticker_info = yf.Ticker(ticker).info
-    long_name = ticker_info["longName"]
-    price = ticker_info["currentPrice"]
-    prev_close = ticker_info["previousClose"]
-    change = price - prev_close
-    change_percent = change / price * 100
-    color = "green" if change > 0 else "red"
-    plus = "+" if change > 0 else ""
-    prediction = model.predict(ticker_history)
-    prediction_color = "green" if prediction > price else "red"
-
-    return f'<b>{long_name}</b><br><b style="font-size: 20px;">{price:.2f}</b> ' \
-           f'<span style="color: {color};">{plus}{change:.2f} ({plus}{change_percent:.2f}%)</span><br>' \
-           f'Close Price prediction for next working day: <b style="font-size: 20px; color: {prediction_color};">{prediction:.2f}</b>'
-
-
-def create_plot(ticker_history, title):
+def create_plot(ticker_history):
     fig = make_subplots(
         rows=2,
         cols=1,
@@ -85,7 +68,6 @@ def create_plot(ticker_history, title):
     today = datetime.date.today()
     last_month = today.replace(month=today.month - 1)
     fig.update_layout(
-        title=dict(text=title),
         height=800,
         xaxis=dict(
             rangeselector=dict(
@@ -103,7 +85,6 @@ def create_plot(ticker_history, title):
             range=[last_month, today]
         ),
         legend=dict(orientation='h'),
-        margin=dict(t=200)
     )
     fig.update(layout_xaxis_rangeslider_visible=False)
 
@@ -114,7 +95,30 @@ def viz(request):
     ticker = request.GET.get('ticker')
     ticker_history = get_ticker_history(ticker)
     model = Model(MODEL_FILENAME, SCALER_FILENAME)
-    title = get_title(ticker, ticker_history, model)
-    plot_div = create_plot(ticker_history, title)
+    ticker_info = yf.Ticker(ticker).info
 
-    return render(request, 'viz/base.html', context={'plot_div': plot_div})
+    long_name = ticker_info["longName"]
+    price = ticker_info["currentPrice"]
+    prev_close = ticker_info["previousClose"]
+    change = price - prev_close
+    change_percent = change / price * 100
+    color = "green" if change > 0 else "red"
+    plus = "+" if change > 0 else ""
+    prediction = model.predict(ticker_history)
+    prediction_color = "green" if prediction > price else "red"
+    plot_div = create_plot(ticker_history)
+
+    context = {
+        'long_name': long_name,
+        'price': f'{price:.2f}',
+        'color': color,
+        'plus': plus,
+        'change': f'{change:.2f}',
+        'change_percent': f'{change_percent:.2f}',
+        'prediction_color': prediction_color,
+        'prediction': f'{prediction:.2f}',
+        'year': datetime.datetime.now().year,
+        'plot_div': plot_div
+    }
+
+    return render(request, 'viz/base.html', context=context)
