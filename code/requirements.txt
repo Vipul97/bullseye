@@ -1,0 +1,7 @@
+django
+keras
+numpy
+pandas
+plotly
+scikit-learn
+yfinance
